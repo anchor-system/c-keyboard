@@ -1,0 +1,12 @@
+[submodule "rtmidi"]
+	path = external_libraries/rtmidi
+	url = git@github.com:thestk/rtmidi.git
+[submodule "glfw"]
+	path = external_libraries/glfw
+	url = git@github.com:glfw/glfw.git
+[submodule "external_libraries/glad_opengl_3.3_core"]
+	path = external_libraries/glad_opengl_3.3_core
+	url = git@github.com:cuppajoeman/glad_opengl_3.3_core.git
+[submodule "external_libraries/linmath.h"]
+	path = external_libraries/linmath.h
+	url = git@github.com:datenwolf/linmath.h.git
