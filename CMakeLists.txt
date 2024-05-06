@@ -1,4 +1,5 @@
 cmake_minimum_required(VERSION 3.10)
+set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 project(c-keyboard)
 
@@ -8,6 +9,7 @@ set(BUILD_SHARED_LIBS OFF)
 
 add_executable(c-keyboard main.cpp)
 
+# RTMIDI: midi library
 add_subdirectory(external_libraries/rtmidi)
 
 # GLAD: opengl function loader
@@ -23,7 +25,6 @@ set(GLFW_BUILD_EXAMPLES OFF CACHE BOOL "" FORCE)
 add_subdirectory(external_libraries/glfw)
 
 # linmath.h: basic linear algebra
-
 include_directories(external_libraries/linmath.h)
 
 target_link_libraries(c-keyboard rtmidi glfw glad)

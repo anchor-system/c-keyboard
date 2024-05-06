@@ -8,14 +8,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-//*****************************************//
-//  midiout.cpp
-//  by Gary Scavone, 2003-2004.
-//
-//  Simple program to test MIDI output.
-//
-//*****************************************//
-
 #include "RtMidi.h"
 #include <cstdlib>
 #include <iostream>
@@ -38,6 +30,9 @@ RtMidi::Api chooseMidiApi();
 
 RtMidiOut *midiout = 0;
 std::vector<unsigned char> message;
+
+bool super_key_pressed = false;
+bool transpose_combo_pressed = false;
 
 // back to graphics
 
@@ -73,8 +68,24 @@ static void error_callback(int error, const char *description) {
 }
 
 const int c_4 = 60;
-int transpose = 3;
-int lowest_note = 60 - 2 * 12 + transpose;
+int transpose = 0;
+int lowest_note = -1;
+void set_lowest_note(int transpose) { lowest_note = 60 - 2 * 12 + transpose; };
+
+int glfw_top_row_numbers[12] = {
+    GLFW_KEY_GRAVE_ACCENT,
+    GLFW_KEY_1,
+    GLFW_KEY_2,
+    GLFW_KEY_3,
+    GLFW_KEY_4,
+    GLFW_KEY_5,
+    GLFW_KEY_6,
+    GLFW_KEY_7,
+    GLFW_KEY_8,
+    GLFW_KEY_9,
+    GLFW_KEY_0,
+    GLFW_KEY_MINUS,
+};
 
 int glfw_key_map[48] = {
 
@@ -144,27 +155,66 @@ static void key_callback(GLFWwindow *window, int key, int scancode, int action,
                          int mods) {
   // if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS)
   //     glfwSetWindowShouldClose(window, GLFW_TRUE);
-
-  int note = convert_key_to_note(key);
-
-  if (note != -1) {
+  //
+  if (key == GLFW_KEY_SPACE) {
     if (action == GLFW_PRESS) {
-      // Note On: 144, 64, 90
-      message[0] = 144; // on
-      message[1] = note;
-      message[2] = 75; // vel
-      midiout->sendMessage(&message);
+      super_key_pressed = true;
+      printf("super key pressed\n");
     } else if (action == GLFW_RELEASE) {
-      // Note Off: 128, 64, 40
-      message[0] = 128; // off
-      message[1] = note;
-      message[2] = 40; // vel
-      midiout->sendMessage(&message);
+      printf("super key released\n");
+      super_key_pressed = false;
+    }
+  }
+
+  if (key == GLFW_KEY_T) {
+    if (action == GLFW_PRESS) {
+      printf("t pressed\n");
+      if (super_key_pressed) {
+        printf("transpose_combo_pressed");
+        transpose_combo_pressed = true;
+      }
+    } else if (action == GLFW_RELEASE) {
+      printf("t released\n");
+      transpose_combo_pressed = false;
+    }
+  }
+
+  if (transpose_combo_pressed) {
+    printf("starting search\n");
+    for (int i = 0; i < 12; i++) {
+      if (key == glfw_top_row_numbers[i]) {
+        printf("found\n");
+        if (action == GLFW_PRESS) {
+          printf("set transpose to %d", i);
+          set_lowest_note(i);
+        }
+      }
+    }
+  }
+
+  if (!super_key_pressed) { // don't play notes if we're issuing a command
+    int note = convert_key_to_note(key);
+    if (note != -1) {
+      if (action == GLFW_PRESS) {
+        // Note On: 144, 64, 90
+        message[0] = 144; // on
+        message[1] = note;
+        message[2] = 75; // vel
+        midiout->sendMessage(&message);
+      } else if (action == GLFW_RELEASE) {
+        // Note Off: 128, 64, 40
+        message[0] = 128; // off
+        message[1] = note;
+        message[2] = 40; // vel
+        midiout->sendMessage(&message);
+      }
     }
   }
 }
 
 int main(void) {
+
+  set_lowest_note(0);
 
   // RtMidiOut constructor
   try {
