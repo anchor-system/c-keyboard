@@ -24,9 +24,9 @@
 // This function should be embedded in a try/catch block in case of
 // an exception.  It offers the user a choice of MIDI ports to open.
 // It returns false if there are no ports available.
-bool chooseMidiPort(RtMidiOut *rtmidi);
+bool choose_midi_port(RtMidiOut *rtmidi);
 
-RtMidi::Api chooseMidiApi();
+RtMidi::Api choose_midi_api();
 
 RtMidiOut *midiout = 0;
 std::vector<unsigned char> message;
@@ -218,7 +218,7 @@ int main(void) {
 
   // RtMidiOut constructor
   try {
-    midiout = new RtMidiOut(chooseMidiApi());
+    midiout = new RtMidiOut(choose_midi_api());
   } catch (RtMidiError &error) {
     error.printMessage();
     exit(EXIT_FAILURE);
@@ -226,7 +226,7 @@ int main(void) {
 
   // Call function to select port.
   try {
-    if (chooseMidiPort(midiout) == false)
+    if (choose_midi_port(midiout) == false)
       goto cleanup;
   } catch (RtMidiError &error) {
     error.printMessage();
@@ -336,7 +336,7 @@ cleanup:
   exit(EXIT_SUCCESS);
 }
 
-bool chooseMidiPort(RtMidiOut *rtmidi) {
+bool choose_midi_port(RtMidiOut *rtmidi) {
   std::cout << "\nWould you like to open a virtual output port? [y/N] ";
 
   std::string keyHit;
@@ -373,7 +373,7 @@ bool chooseMidiPort(RtMidiOut *rtmidi) {
   return true;
 }
 
-RtMidi::Api chooseMidiApi() {
+RtMidi::Api choose_midi_api() {
   std::vector<RtMidi::Api> apis;
   RtMidi::getCompiledApi(apis);
 
